@@ -1,0 +1,19 @@
+postgres=# \! chcp 1251
+Active code page: 1251
+postgres=# create database ebike_db;
+CREATE DATABASE
+postgres=# create user user1 with password '1111';
+CREATE ROLE
+postgres=# create user user2 with password '2222';
+CREATE ROLE
+postgres=# \c ebike_db
+Ви тепер під'єднані до бази даних "ebike_db" як користувач "postgres".
+ebike_db=# GRANT ALL ON DATABASE ebike_db to user1;
+GRANT
+ebike_db=# GRANT ALL ON SCHEMA public TO user1;
+GRANT
+ebike_db=# GRANT USAGE ON SCHEMA public TO user2;
+GRANT
+ebike_db=# GRANT SELECT ON ALL TABLES IN SCHEMA public TO user2;
+GRANT
+ebike_db=#
