@@ -46,11 +46,6 @@ SELECT * FROM bikes ORDER BY bike_range DESC LIMIT 5;
 SELECT AVG(bike_range) AS avg_range FROM bikes 
 JOIN battery ON bikes.battery_id = battery.battery_id 
 WHERE battery.battery_cappacity = 20;
---14. Вибрати велосипеди з контролерами, виробленими в країнах, де виробляється найбільше велосипедів:
-SELECT * FROM bikes 
-JOIN controller ON bikes.controller_id = controller.controller_id 
-WHERE controller.controller_country IN (
-    SELECT producing_country FROM bikes GROUP BY producing_country ORDER BY COUNT(*) DESC LIMIT 1);
 --15. Отримати середній діапазон пробігу для кожного бренду велосипедів:
 SELECT bike_brand, AVG(bike_range) AS avg_range FROM bikes GROUP BY bike_brand;
 --16. Вибрати велосипеди з моторами, виробленими в країнах, що не є частиною "Великої Вісімки" (G8):
@@ -299,7 +294,7 @@ WHERE motor.producing_country = 'Germany';
 --85. Вибрати велосипеди з батареями від певної країни виробництва:
 SELECT * FROM bikes 
 JOIN battery ON bikes.battery_id = battery.battery_id 
-WHERE battery.producing_country = 'USA';
+WHERE battery.producing_country = 'Germany';
 --86. Вибрати велосипеди з контролерами від певної країни виробництва:
 SELECT * FROM bikes 
 JOIN controller ON bikes.controller_id = controller.controller_id 
@@ -356,3 +351,10 @@ WHERE bms LIKE 'k%';
 SELECT DISTINCT producing_country
 FROM motor
 WHERE producing_country LIKE 'U%';
+
+-- Кількість контроллерів які встановлені разом з мотором < 500 ват і контроллери виготовлені в Китаї
+
+SELECT count(b.controller_id) AS amount FROM bikes b
+JOIN controller c ON b.controller_id = c.controller_id
+JOIN motor m ON b.motor_id = m.motor_id
+WHERE m.motor_power < 1000 AND c.controller_country = 'China'
