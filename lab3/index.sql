@@ -1,5 +1,5 @@
-CREATE INDEX idx_bikes_id ON bikes (bike_id);
-CREATE INDEX idx_brand_id ON brand (brand_id);
+CREATE INDEX idx_bikes_price ON bikes (bike_price);
+CREATE INDEX idx_motor ON motor (motor_power);
 
 SELECT * FROM bikes b 
 JOIN motor m ON b.motor_id = m.motor_id

@@ -28,13 +28,19 @@ CREATE OR REPLACE PROCEDURE add_motor(
 LANGUAGE plpgsql
 AS $$
 BEGIN
+    IF motor_power  NOT BETWEEN 200 AND 1200
+    THEN
+    RAISE EXCEPTION 'Check power';
+    END IF;
+    
     INSERT INTO motor (motor_power, motor_volt, motor_type, brand_id)
     VALUES (motor_power, motor_volt, motor_type, brand_id);
+    
 END;
 $$;
 
 --Перевірка
-CALL add_motor(750,48,'reducer',2);
+CALL add_motor(150,48,'reducer',2);
 
 
 --Додавання батареї
