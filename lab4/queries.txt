@@ -1,0 +1,37 @@
+db.bikes.find({})
+db.bikes.find({ category: "гірські велосипеди", brand: "Trek" })
+db.bikes.find({ rating: { $gt: 4 } })
+db.bikes.find({ price: { $lt: 1000 } })
+db.bikes.find({ category: "електричні велосипеди" }).count()
+db.bikes.find({}).sort({ price: -1 })
+db.bikes.find({}).sort({ rating: -1 }).limit(5)
+db.bikes.find({ stock: { $lt: 10 } }).count()
+db.bikes.find({}).limit(5)
+db.bikes.find({ price: { $gte: 500, $lte: 1000 } })
+db.bikes.find({}).sort({ stock: -1 }).limit(5)
+db.bikes.find({ description: /гірський/ })
+db.bikes.find({ rating: { $gt: 4 }, stock: { $gt: 10 } })
+
+db.bikes.aggregate([
+  { $group: { _id: "$category", count: { $sum: 1 } } }
+])
+db.bikes.aggregate([
+  { $group: { _id: "$category", avgPrice: { $avg: "$price" } } }
+])
+db.bikes.aggregate([
+  { $group: { _id: null, maxPrice: { $max: "$price" }, minPrice: { $min: "$price" } } }
+])
+db.bikes.aggregate([
+  { $group: { _id: "$category", avgRating: { $avg: "$rating" } } }
+])
+db.bikes.aggregate([
+  { $group: { _id: "$brand", count: { $sum: 1 } } }
+])
+db.bikes.aggregate([
+  { $group: { _id: null, totalValue: { $sum: "$price" } } }
+])
+db.bikes.aggregate([
+  { $sort: { price: -1 } },
+  { $group: { _id: "$category", bike: { $first: "$$ROOT" } } },
+  { $replaceRoot: { newRoot: "$bike" } }
+])
