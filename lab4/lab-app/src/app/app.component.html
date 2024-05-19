@@ -1,0 +1,26 @@
+<h2>Bike shop!</h2>
+<h4>Форма запиту</h4>
+<form>
+  <p>id</p>
+    <input type="number" [(ngModel)]="id" name="id" placeholder="Id" class="form-control"><br>
+    <p>name</p>
+    <input type="text" [(ngModel)]="name" name="name" placeholder="name" class="form-control"><br>
+    <p>description</p>
+    <input type="text" [(ngModel)]="description" name="description" placeholder="description" class="form-control"><br>
+    <p>price</p>
+    <input type="number" [(ngModel)]="price" name="price" placeholder="price" class="form-control"><br>
+    <p>catigory</p>
+    <input type="text" [(ngModel)]="catigory" name="catigory" placeholder="catigory" class="form-control"><br>
+    <p>brand</p>
+    <input type="text" [(ngModel)]="brand" name="brand" placeholder="brand" class="form-control"><br>
+    <p>stock</p>
+    <input type="number" [(ngModel)]="stock" name="stock" placeholder="stock" class="form-control"><br>
+    <p>rating</p>
+    <input type="number" [(ngModel)]="rating" name="rating" placeholder="rating" class="form-control"><br>
+    
+    <button type="button">Отримати всі</button>
+    <button type="button">Отримати по ID</button>
+    <button type="button">Додати новий</button>
+    <button type="button">Редагувати за ID</button>
+    <button type="button">Видалити за ID</button>
+</form>
