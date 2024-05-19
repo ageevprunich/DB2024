@@ -1,117 +1,88 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
-const Bike = require('../models/bike');
 
-const db = "mongodb://localhost:27017/mongo";
-mongoose.Promise = global.Promise;
+// const Bike = require('../models/bike');
 
-mongoose.connect(db, { useNewUrlParser: true, useUnifiedTopology: true }, (err) => {
-    if (err) {
-        console.error("Помилка підключення до бази даних: ", err);
-    } else {
-        console.log("З'єднання з базою даних встановлено");
-    }
+
+mongoose.connect("mongodb://localhost:27017/mongo");
+
+mongoose.connection.on('connected', () =>{
+    console.log("Connected success");
 });
 
+mongoose.connection.on('error', (err) =>{
+    console.log("Connection failed" + err);
+});
+
+// Запит для отримання всіх велосипедів
 router.get('/bikes', async (req, res) => {
     try {
-        console.log('Get request for all bikes');
-        const bikes = await Bike.find({}).exec();
+        const bikes = await mongoose.connection.db.collection('bikes').find({}).toArray();
         res.json(bikes);
     } catch (err) {
-        console.error("Error retrieving bikes: ", err);
-        res.status(500).send("Error retrieving bikes");
+        res.status(500).json({ message: err.message });
     }
 });
 
+// Запит для отримання велосипеду за ID
 router.get('/bikes/:id', async (req, res) => {
-    const bikeId = req.params.id;
     try {
-        console.log(`Get request for bike with ID: ${bikeId}`);
-        const bike = await Bike.findById(bikeId).exec();
-        if (bike) {
-            res.json(bike);
-        } else {
-            res.status(404).send("Bike not found");
+        const bike = await mongoose.connection.db.collection('bikes').findOne({ id: (req.params.id) });
+        if (!bike) {
+            return res.status(404).json({ message: 'Bike not found' });
         }
+        res.json(bike);
     } catch (err) {
-        console.error("Error retrieving bike: ", err);
-        res.status(500).send("Error retrieving bike");
+        res.status(500).json({ message: err.message });
     }
 });
 
+// Запит для створення нового велосипеду
 router.post('/bikes', async (req, res) => {
-    const newBike = new Bike({
-        name: req.body.name,
-        description: req.body.description,
-        price: req.body.price,
-        category: req.body.category,
-        brand: req.body.brand,
-        stock: req.body.stock,
-        rating: req.body.rating
-    });
-
+    const newBike = req.body;
     try {
-        console.log('Post a new bike');
-        const insertedBike = await newBike.save();
-        res.json(insertedBike);
+        const result = await mongoose.connection.db.collection('bikes').insertOne(newBike);
+        if (result.insertedCount === 1 && result.ops && result.ops.length === 1) {
+            res.status(201).json(result.ops[0]);
+        } else {
+            res.status(400).json({ message: 'Failed to insert bike' });
+        }
     } catch (err) {
-        console.error("Error posting bike: ", err);
-        res.status(500).send("Error posting bike");
+        res.status(400).json({ message: err.message });
     }
 });
 
+
+
+// Запит для оновлення велосипеду за ID
 router.put('/bikes/:id', async (req, res) => {
-    console.log('Update a bike');
-    const bikeId = req.params.id;
-
     try {
-        const updatedBike = await Bike.findByIdAndUpdate(
-            bikeId,
-            {
-                $set: {
-                    name: req.body.name,
-                    description: req.body.description,
-                    price: req.body.price,
-                    category: req.body.category,
-                    brand: req.body.brand,
-                    stock: req.body.stock,
-                    rating: req.body.rating
-                },
-            },
-            {
-                new: true,
-                runValidators: true,
-            }
+        const result = await mongoose.connection.db.collection('bikes').updateOne(
+            { id: (req.params.id) },
+            { $set: req.body }
         );
-
-        if (!updatedBike) {
-            return res.status(404).json({ error: 'Bike not found' });
+        if (result.modifiedCount === 0) {
+            return res.status(404).json({ message: 'Bike not found' });
         }
-
-        res.json(updatedBike);
+        res.json({ message: 'Bike updated' });
     } catch (err) {
-        console.error("Error updating bike:", err);
-        res.status(500).json({ error: "Error updating bike" });
+        res.status(400).json({ message: err.message });
     }
 });
 
+// Запит для видалення велосипеду за ID
 router.delete('/bikes/:id', async (req, res) => {
-    console.log('Deleting a bike');
-    const bikeId = req.params.id;
-
     try {
-        const deletedBike = await Bike.findByIdAndDelete(bikeId);
-
-        if (!deletedBike) {
-            return res.status(404).json({ error: 'Bike not found' });
+        const result = await mongoose.connection.db.collection('bikes').deleteOne({ id: (req.params.id) });
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ message: 'Bike not found' });
         }
-
-        res.status(200).json({ message: 'Bike deleted successfully', bike: deletedBike });
+        res.json({ message: 'Bike deleted' });
     } catch (err) {
-        console.error("Error deleting bike:", err);
-        res.status(500).json({ error: "Error deleting bike" });
+        res.status(500).json({ message: err.message });
     }
 });
 
+
+module.exports = router;
